@@ -36,7 +36,7 @@ class TarConan(ConanFile):
     def validate(self):
         if self.settings.os == "Windows":
             raise ConanInvalidConfiguration("This recipe does not support Windows builds of tar")  # FIXME: fails on MSVC and mingw-w64
-        if not self.options["bzip2"].build_executable:
+        if not self.dependencies["bzip2"].options.build_executable:
             raise ConanInvalidConfiguration("bzip2:build_executable must be enabled")
 
     def package_id(self):
@@ -72,6 +72,7 @@ class TarConan(ConanFile):
             print(f"patching os version specific: {p['patch_file']}")
             patch(self, **p, base_path=self.source_folder)
 
+    @property
     def _configure_autotools(self):
         bzip2_exe = "bzip2"  # FIXME: get from bzip2 recipe
         lzip_exe = "lzip"  # FIXME: get from lzip recipe
@@ -96,30 +97,25 @@ class TarConan(ConanFile):
 
 
     def build(self):
-        self._patch_sources()
+        #self._patch_sources()
 
-        if self.settings.compiler == "Visual Studio":
-            tools.replace_in_file(os.path.join(self._source_subfolder, "gnu", "faccessat.c"),
+        if self.settings.compiler == "msvc":
+            replace_in_file(self, os.path.join(self.source_folder, "gnu", "faccessat.c"),
                                   "_GL_INCLUDING_UNISTD_H", "_GL_INCLUDING_UNISTD_H_NOP")
 
-        self._patch_sources()
+        #self._patch_sources()
 
         autotools = Autotools(self)
-        autotools.configure(args=self._configure_args)
+        autotools.configure(args=self._configure_autotools)
         autotools.make()
 
     def package(self):
-        copy(self, "COPYING", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
         autotools = Autotools(self)
         autotools.install()
 
+        copy(self, "COPYING", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
         rmdir(self, os.path.join(self.package_folder, "share"))
 
     def package_info(self):
-        bin_path = os.path.join(self.package_folder, "bin")
-        self.output.info("Appending PATH environment variable: {}".format(bin_path))
-        self.env_info.PATH.append(bin_path)
-
-        tar_bin = os.path.join(self.package_folder, "bin", "tar")
-        self.user_info.tar = tar_bin
-        self.env_info.TAR = tar_bin
+        bin_dir = os.path.join(self.package_folder, "bin")
+        self.runenv_info.prepend_path("PATH", bin_dir)
