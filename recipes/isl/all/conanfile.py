@@ -1,133 +1,112 @@
-from conans import AutoToolsBuildEnvironment, ConanFile, tools
-from conans.errors import ConanInvalidConfiguration
+from conan import ConanFile
+from conan.tools.files import get, copy, rmdir
+from conan.tools.gnu import Autotools, AutotoolsDeps, AutotoolsToolchain, PkgConfigDeps
+from conan.errors import ConanInvalidConfiguration
 from contextlib import contextmanager
+from conan.tools.build import cross_building
+from conan.tools.env import VirtualRunEnv, VirtualBuildEnv
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, rm, rmdir
 import os
 
 required_conan_version = ">=1.33.0"
 
 
 class IslConan(ConanFile):
-    name = "isl"
-    description = "isl is a library for manipulating sets and relations of integer points bounded by linear constraints."
-    topics = ("isl", "integer", "set", "library")
-    license = "MIT"
-    homepage = "https://libisl.sourceforge.io"
-    url = "https://github.com/conan-io/conan-center-index"
-    settings = "os", "arch", "compiler", "build_type"
-    options = {
-        "shared": [True, False],
-        "fPIC": [True, False],
-        "with_int": ["gmp", "imath", "imath-32"],
-    }
-    default_options = {
-        "shared": False,
-        "fPIC": True,
-        "with_int": "gmp",
-    }
+  name = "isl"
+  description = "isl is a library for manipulating sets and relations of integer points bounded by linear constraints."
+  topics = ("isl", "integer", "set", "library")
+  license = "MIT"
+  homepage = "https://libisl.sourceforge.io"
+  url = "https://github.com/conan-io/conan-center-index"
+  settings = "os", "arch", "compiler", "build_type"
+  options = {
+    "shared": [True, False],
+    "fPIC": [True, False],
+    "with_int": ["gmp", "imath", "imath-32"],
+  }
+  default_options = {
+    "shared": False,
+    "fPIC": True,
+    "with_int": "gmp",
+  }
 
-    _autotools = None
+  def export_sources(self):
+      export_conandata_patches(self)
 
-    @property
-    def _source_subfolder(self):
-        return "source_subfolder"
+  def config_options(self):
+    if self.settings.os == "Windows":
+      del self.options.fPIC
 
-    def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
+  def configure(self):
+    if self.options.shared:
+      del self.options.fPIC
+    del self.settings.compiler.libcxx
+    del self.settings.compiler.cppstd
 
-    def configure(self):
-        if self.options.shared:
-            del self.options.fPIC
-        del self.settings.compiler.libcxx
-        del self.settings.compiler.cppstd
+  def validate(self):
+    if self.settings.os == "Windows" and self.options.shared:
+      raise ConanInvalidConfiguration("Cannot build shared isl library on Windows (due to libtool refusing to link to static/import libraries)")
+    if self.settings.os == "Macos" and self.settings.arch == "armv8":
+      raise ConanInvalidConfiguration("Apple M1 is not yet supported. Contributions are welcome")
+    #if self.options.with_int != "gmp":
+      # FIXME: missing imath recipe
+      #raise ConanInvalidConfiguration("imath is not (yet) available on cci")
+    if self.settings.compiler == "msvc" and tools.Version(self.settings.compiler.version) < 16 and self.settings.compiler.runtime == "MDd":
+      # gmp.lib(bdiv_dbm1c.obj) : fatal error LNK1318: Unexpected PDB error; OK (0)
+      raise ConanInvalidConfiguration("isl fails to link with this version of visual studio and MDd runtime")
 
-    def validate(self):
-        if self.settings.os == "Windows" and self.options.shared:
-            raise ConanInvalidConfiguration("Cannot build shared isl library on Windows (due to libtool refusing to link to static/import libraries)")
-        if self.settings.os == "Macos" and self.settings.arch == "armv8":
-            raise ConanInvalidConfiguration("Apple M1 is not yet supported. Contributions are welcome")
-        if self.options.with_int != "gmp":
-            # FIXME: missing imath recipe
-            raise ConanInvalidConfiguration("imath is not (yet) available on cci")
-        if self.settings.compiler == "Visual Studio" and tools.Version(self.settings.compiler.version) < 16 and self.settings.compiler.runtime == "MDd":
-            # gmp.lib(bdiv_dbm1c.obj) : fatal error LNK1318: Unexpected PDB error; OK (0)
-            raise ConanInvalidConfiguration("isl fails to link with this version of visual studio and MDd runtime")
+  def requirements(self):
+    if self.options.with_int == "gmp":
+      self.requires("gmp/6.3.0")
+    if self.options.with_int == "imath":
+      self.requires("imath/3.1.9")
 
-    def requirements(self):
-        if self.options.with_int == "gmp":
-            self.requires("gmp/6.2.1")
+  def build_requirements(self):
+    pass
 
-    @property
-    def _settings_build(self):
-        return getattr(self, "settings_build", self.settings)
+  def generate(self):
+    pc = PkgConfigDeps(self)
+    pc.generate()
+    #env = VirtualBuildEnv(self)
+    #env.generate()
 
-    def build_requirements(self):
-        if self._settings_build.os == "Windows" and not tools.get_env("CONAN_BASH_PATH"):
-            self.build_requires("msys2/cci.latest")
-        if self.settings.compiler == "Visual Studio":
-            self.build_requires("automake/1.16.4")
+    yes_no = lambda v: "yes" if v else "no"
+    rootpath_no = lambda v, req: self.dependencies[req].package_folder if v else "no"
+    gmp_dir = self.dependencies["gmp"].package_folder
 
-    def source(self):
-        tools.get(**self.conan_data["sources"][self.version],
-                  strip_root=True, destination=self._source_subfolder)
+    tc = AutotoolsToolchain(self)
+    tc.configure_args.extend([
+      f"--with-int={self.options.with_int}",
+      #f"--with-gmp-builddir={gmp_dir}",
+      "--enable-portable-binary",
+      "--enable-shared={}".format(yes_no(self.options.shared)),
+      "--enable-static={}".format(yes_no(not self.options.shared)),
+    ])
+    tc.generate()
 
-    @contextmanager
-    def _build_context(self):
-        if self.settings.compiler == "Visual Studio":
-            with tools.vcvars(self.settings):
-                env = {
-                    "AR": "{} lib".format(tools.unix_path(self.deps_user_info["automake"].ar_lib)),
-                    "CC": "{} cl -nologo -{}".format(tools.unix_path(self.deps_user_info["automake"].compile), self.settings.compiler.runtime),
-                    "CXX": "{} cl -nologo -{}".format(tools.unix_path(self.deps_user_info["automake"].compile), self.settings.compiler.runtime),
-                    "NM": "dumpbin -symbols",
-                    "OBJDUMP": ":",
-                    "RANLIB": ":",
-                    "STRIP": ":",
-                }
-                with tools.environment_append(env):
-                    yield
-        else:
-            yield
+    deps = AutotoolsDeps(self)
+    deps.generate()
 
-    def _configure_autotools(self):
-        if self._autotools:
-            return self._autotools
-        self._autotools = AutoToolsBuildEnvironment(self, win_bash=tools.os_info.is_windows)
-        self._autotools.libs = []
-        yes_no = lambda v: "yes" if v else "no"
-        conf_args = [
-            "--with-int={}".format(self.options.with_int),
-            "--enable-portable-binary",
-            "--enable-shared={}".format(yes_no(self.options.shared)),
-            "--enable-static={}".format(yes_no(not self.options.shared)),
-        ]
-        if self.options.with_int == "gmp":
-            conf_args.extend([
-                "--with-gmp=system",
-                "--with-gmp-prefix={}".format(self.deps_cpp_info["gmp"].rootpath.replace("\\", "/")),
-            ])
-        if self.settings.compiler == "Visual Studio":
-            if tools.Version(self.settings.compiler.version) >= 15:
-                self._autotools.flags.append("-Zf")
-            if tools.Version(self.settings.compiler.version) >= 12:
-                self._autotools.flags.append("-FS")
-        self._autotools.configure(args=conf_args, configure_dir=self._source_subfolder)
-        return self._autotools
+  def source(self):
+    get(self, **self.conan_data["sources"][self.version], strip_root=True, filename=f"isl-{self.version}.tar.gz")
 
-    def build(self):
-        with self._build_context():
-            autotools = self._configure_autotools()
-            autotools.make()
+  def build(self):
+    apply_conandata_patches(self)
 
-    def package(self):
-        self.copy("LICENSE", src=self._source_subfolder, dst="licenses")
-        with self._build_context():
-            autotools = self._configure_autotools()
-            autotools.install()
+    autotools = Autotools(self)
+    autotools.configure()
+    autotools.make()
+      
 
-        os.unlink(os.path.join(os.path.join(self.package_folder, "lib", "libisl.la")))
-        tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
+  def package(self):
+    autotools = Autotools(self)
+    autotools.install()
+    copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+    
 
-    def package_info(self):
-        self.cpp_info.names["pkg_config"] = "isl"
-        self.cpp_info.libs = ["isl"]
+    os.unlink(os.path.join(os.path.join(self.package_folder, "lib", "libisl.la")))
+    rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
+
+  def package_info(self):
+    #self.cpp_info.names["pkg_config"] = "isl"
+    self.cpp_info.libs = ["isl"]

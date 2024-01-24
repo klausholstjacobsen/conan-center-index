@@ -1,0 +1,64 @@
+--- configure	2024-01-18 06:44:05.335204235 +0100
++++ configure	2024-01-18 06:45:04.785371436 +0100
+@@ -5952,7 +5952,7 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ 
+ 
+@@ -5966,7 +5966,7 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ if test -n "$ac_build_tool_prefix"; then
+   # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
+@@ -6691,14 +6691,14 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ 
+ 
+   ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CC_FOR_BUILD understands -c and -o together" >&5
+ printf %s "checking whether $CC_FOR_BUILD understands -c and -o together... " >&6; }
+@@ -6751,7 +6751,7 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ 
+ 
+@@ -7150,7 +7150,7 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking how to run the C preprocessor" >&5
+ printf %s "checking how to run the C preprocessor... " >&6; }
+@@ -7276,7 +7276,7 @@
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+-ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
++ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ 
+ 
