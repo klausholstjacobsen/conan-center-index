@@ -1,0 +1,11 @@
+--- crypto/bio/bss_dgram.c	2023-11-23 14:20:19.000000000 +0100
++++ crypto/bio/bss_dgram.c	2024-05-10 11:26:13.173690457 +0200
+@@ -1169,7 +1169,7 @@
+         cmsg->cmsg_type  = IP_PKTINFO;
+ 
+         info = (struct in_pktinfo *)BIO_CMSG_DATA(cmsg);
+-#   if !defined(OPENSSL_SYS_WINDOWS) && !defined(OPENSSL_SYS_CYGWIN)
++#   if !defined(OPENSSL_SYS_WINDOWS) && !defined(OPENSSL_SYS_CYGWIN) && !defined(__QNX__)
+         info->ipi_spec_dst      = local->s_in.sin_addr;
+ #   endif
+         info->ipi_addr.s_addr   = 0;

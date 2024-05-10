@@ -40,3 +40,7 @@ patches:
       patch_description: "Only include winsock2.h for struct timeval if needed"
       patch_type: "bugfix"
       patch_source: "https://github.com/openssl/openssl/commit/ba58e9f1e22dd9ee2e37078640dcbe9f520a555d"
+    - patch_file: "patches/3.2.0-fix-qnx-bss_dgram.patch"
+      patch_description: "Do not use in_pktinfo.ipi_spec_dst on qnx"
+      patch_type: "portability"
+      patch_source: "https://github.com/klausholstjacobsen/openssl/commit/277b5aff7999e387540f274fe3f1f25bf5d61fc0"
